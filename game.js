@@ -211,25 +211,12 @@ function game_loop(){
     }
 
     level_view[player_y][player_x] = "英";
-    document.getElementById("r0").innerHTML = level_view[view_offset_y + 0].join("");
-    document.getElementById("r1").innerHTML = level_view[view_offset_y + 1].join("");
-    document.getElementById("r2").innerHTML = level_view[view_offset_y + 2].join("");
-    document.getElementById("r3").innerHTML = level_view[view_offset_y + 3].join("");
-    document.getElementById("r4").innerHTML = level_view[view_offset_y + 4].join("");
-    document.getElementById("r5").innerHTML = level_view[view_offset_y + 5].join("");
-    document.getElementById("r6").innerHTML = level_view[view_offset_y + 6].join("");
-    document.getElementById("r7").innerHTML = level_view[view_offset_y + 7].join("");
-    document.getElementById("r8").innerHTML = level_view[view_offset_y + 8].join("");
-    document.getElementById("r9").innerHTML = level_view[view_offset_y + 9].join("");
-    document.getElementById("r10").innerHTML = level_view[view_offset_y + 10].join("");
-    document.getElementById("r11").innerHTML = level_view[view_offset_y + 11].join("");
-    document.getElementById("r12").innerHTML = level_view[view_offset_y + 12].join("");
-    document.getElementById("r13").innerHTML = level_view[view_offset_y + 13].join("");
-    document.getElementById("r14").innerHTML = level_view[view_offset_y + 14].join("");
-    document.getElementById("r15").innerHTML = level_view[view_offset_y + 15].join("");
-    document.getElementById("r16").innerHTML = level_view[view_offset_y + 16].join("");
-    document.getElementById("r17").innerHTML = level_view[view_offset_y + 17].join("");
-    document.getElementById("r18").innerHTML = level_view[view_offset_y + 18].join("");
+    for(var i = 0; i < 19; i++){
+        var toWrite = level_view[view_offset_y + i].join("");
+        if (document.getElementById("r"+i).innerHTML != toWrite) {
+            document.getElementById("r"+i).innerHTML = toWrite;
+        }
+    }
 }
 
 var level;
