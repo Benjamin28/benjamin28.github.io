@@ -12,7 +12,7 @@ class tree {
             case "burning":
                 return color_text("火", "red");
             case "burnt":
-                return color_text("灰", "gray");
+                return color_text("灰", "lightgray");
         }
     }
     ignite(){
@@ -66,6 +66,33 @@ class water {
     ignite(){}
     player_can_traverse(){return false;}
 }
+class prop {
+    constructor(icon, color){
+        this.icon = icon;
+        this.color = color;
+    }
+    getDisplay(){
+        return color_text(this.icon, this.color);
+    }
+    ignite(){}
+    system(){}
+    player_interact(){}
+    player_can_traverse(){ return false; }
+}
+
+class ground {
+    constructor(icon, color){
+        this.icon = icon;
+        this.color = color;
+    }
+    getDisplay(){
+        return color_text(this.icon, this.color);
+    }
+    ignite(){}
+    system(){}
+    player_interact(){}
+    player_can_traverse(){ return true; }
+}
 
 class empty {
     constructor(state) {
@@ -95,7 +122,7 @@ class forest {
             case "burning":
                 return color_text("焱", "red");
             case "burnt":
-                return color_text("灰", "gray");
+                return color_text("灰", "lightgray");
         }
     }
     ignite(){
@@ -183,7 +210,7 @@ function game_loop(){
         }
     }
 
-    level_view[player_y][player_x] = "兵";
+    level_view[player_y][player_x] = "英";
     document.getElementById("r0").innerHTML = level_view[view_offset_y + 0].join("");
     document.getElementById("r1").innerHTML = level_view[view_offset_y + 1].join("");
     document.getElementById("r2").innerHTML = level_view[view_offset_y + 2].join("");
@@ -206,7 +233,6 @@ function game_loop(){
 }
 
 var level;
-var game_view;
 var view_offset_x = 0;
 var view_offset_y = 0;
 var player_y = 4;
@@ -214,41 +240,62 @@ var player_x = 0;
 var current_time;
 
 window.onload=function(){
-    level = [
-        ["e", "e", "e", "e", "t", "f", "t", "w", "w", "w", "e", "e", "e", "e", "t", "f", "t", "e", "e", "e"],
-        ["e", "e", "e", "e", "e", "t", "e", "e", "w", "w", "e", "e", "e", "e", "e", "t", "e", "e", "e", "e"],
-        ["e", "e", "e", "e", "t", "f", "t", "e", "w", "w", "w", "e", "e", "e", "t", "f", "t", "e", "e", "e"],
-        ["e", "e", "e", "e", "t", "f", "t", "t", "t", "w", "w", "t", "t", "t", "t", "f", "t", "e", "e", "e"],
-        ["e", "e", "e", "e", "t", "f", "f", "e", "e", "w", "w", "e", "e", "e", "t", "f", "f", "e", "e", "e"],
-        ["e", "e", "e", "e", "e", "t", "t", "e", "w", "w", "w", "e", "e", "e", "e", "t", "t", "e", "e", "e"],
-        ["e", "e", "e", "e", "e", "t", "e", "e", "w", "w", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e"],
-        ["e", "e", "e", "e", "e", "t", "e", "e", "w", "w", "e", "e", "e", "e", "e", "t", "e", "e", "e", "e"],
-        ["e", "e", "e", "e", "t", "f", "t", "e", "w", "w", "w", "w", "e", "e", "t", "f", "t", "e", "e", "e"],
-        ["e", "e", "e", "e", "e", "t", "e", "e", "e", "w", "e", "e", "e", "e", "e", "t", "e", "e", "e", "e"],
-        ["e", "e", "e", "e", "t", "f", "t", "e", "e", "w", "e", "e", "e", "e", "t", "f", "t", "e", "e", "e"],
-        ["e", "e", "e", "e", "e", "t", "e", "e", "e", "w", "e", "e", "e", "e", "e", "t", "e", "e", "e", "e"],
-        ["e", "e", "e", "e", "t", "f", "t", "e", "e", "w", "w", "e", "e", "e", "t", "f", "t", "e", "e", "e"],
-        ["e", "e", "e", "e", "t", "f", "t", "e", "e", "e", "w", "w", "e", "e", "t", "f", "t", "e", "e", "e"],
-        ["e", "e", "e", "e", "t", "f", "f", "e", "e", "e", "e", "e", "e", "e", "t", "f", "f", "e", "e", "e"],
-        ["e", "e", "e", "e", "e", "t", "t", "e", "e", "e", "e", "e", "e", "e", "e", "t", "t", "e", "e", "e"],
-        ["e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e", "e"],
-        ["e", "e", "e", "e", "e", "t", "e", "e", "e", "e", "e", "e", "e", "e", "e", "t", "e", "e", "e", "e"],
-        ["e", "e", "e", "e", "t", "f", "t", "e", "e", "e", "e", "e", "e", "e", "t", "f", "t", "e", "e", "e"],
-        ["e", "e", "e", "e", "e", "t", "e", "e", "e", "e", "e", "e", "e", "e", "e", "t", "e", "e", "e", "e"]
+    level_str = [
+        "gggggggggggggggggggggggggggggwwwwgggggmmmmmmmmmmmmmmmmmmgmmm",
+        "gggggtgggggggggggggggggggggggwwwwggggggmmmmmmmmgmmmmmmmmmmmm",
+        "ggggggggggggggggggggggggggggggwwwwggggggmmmmgmmmmmmtgggmmmmm",
+        "ggggggggggggggggggggggggggggggwwwwgggggggmmmmmmmmgggmmmmmmmg",
+        "ggggggggggggggtggggggggggggggggwwwwgggggmmmmmmmgggmmmmmmmmmg",
+        "ggggggggggggggggggggggggggggggggwwwwgggmmmmmmmggmmmmmmmmmmgg",
+        "ggggggggggggggggggggggggggggggggwwwwgggmmmmmmmgmgmmmmmmmmggg",
+        "gggggggggggggggggggggggggggggggwwwwwggggmmmmmmgmmmmmmmmmgggg",
+        "ggggggggggggggggggggggggggggggwwwwwggggggmmmgggmmmmmmmgggggg",
+        "gggggggggggggggggggggggggggggwwwwwgggggggmmggmggmmmmmggggggg",
+        "ggggggggggggggggggggggggggggwwwwwggggggggmmgmmggmmmmgggggggg",
+        "gggggggggggggggggggggggggggwwgwwgggggggggggggggggmmggggggggg",
+        "ggggggggggggggggggggggggggwwgtwwgggggggggggggggggggggggggggg",
+        "ggggggggtggggggggggggggggwwtffwwgggggggggggggggggggggggggggg",
+        "ggggggggggggggggggggggggwtwtfftwwggggggggggggggggggggggggggg",
+        "gggggggggggggggggggggggwtfwtfftfwwgggggggggggggggggggggggggg",
+        "gggggggggggggggggggggtwttfwtfttttwwwgggggggggggggggggggggggg",
+        "ggggggggggggggggggggtfwfftwttgggggggwwgggggggggggggggggggggg",
+        "ggggggggggggggggggggtfffttwfftggggggggwggggggggggggggggggggg",
+        "gggggggggggggggggggggttttfffftgggggggggwwggggggggggggggggggg",
+        "ggggggggggggggggggggggggtttftgggggggggggwwgggggggggggggggggg",
+        "gggggggggggggggggggggggggggtgggggggggggggwgggggggggggggggggg",
+        "gggggggggggggggggggggggggggggggggggggggggwgggggggggggggggggg",
+        "gggggtggggggggggtgggggggggggggggggggggggggwgqqqqqqq qqqqqqqq",
+        "ggggggggggggggggggggggggggggggggggggggggggwgq              q",
+        "gggggggggggggggggggggggggggtggggggggggggggwgq              q",
+        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
+        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
+        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
+        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
+        "gggggggggggtggggggggggggggggtggggggggggggggwq              q",
+        "gggggggggggggggggggggggggggggggggggggggggggb               q",
+        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
+        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
+        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
+        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
+        "ggggggggggggggggggggtggggggggggggggggggggggwq              q",
+        "gggggtgggggggggggggggggggggggggggggggggggggwq              q",
+        "gggggggggggggggggggggggggggggggggggggggggggwqqqqqqqqqqqqqqqq",
     ]
-    init_level(level);
-    game_view = document.getElementById("game");
+    init_level(level_str);
     document.addEventListener("keydown", keyPush);
     setInterval(game_loop, 1000/30)
 }
-function init_level(level){
-    for(var i = 0; i < level.length; i++) {
+function init_level(level_str){
+    level = new Array(level_str.length);
+    for(var i = 0; i < level_str.length; i++) {
+        level_embedded = new Array(level_str[i].length)
+        level[i] = level_embedded;
         for(var j = 0; j < level[i].length; j++){
-            switch(level[i][j]){
+            switch(level_str[i][j]){
                 case "t":
                     level[i][j] = new tree("normal")
                     break;
-                case "e":
+                case " ":
                     level[i][j] = new empty("normal")
                     break;
                 case "f":
@@ -256,6 +303,21 @@ function init_level(level){
                     break;
                 case "w":
                     level[i][j] = new water("normal")
+                    break;
+                case "m":
+                    level[i][j] = new prop("山", "sienna")
+                    break;
+                case "q":
+                    level[i][j] = new prop("墙", "gray")
+                    break;
+                case "r":
+                    level[i][j] = new ground("路", "tan");
+                    break;
+                case "g":
+                    level[i][j] = new ground("草", "lightgreen");
+                    break;
+                case "b":
+                    level[i][j] = new ground("桥", "brown");
                     break;
             }
         }
