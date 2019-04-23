@@ -172,6 +172,9 @@ function keyPush(evt){
         case 40:
             temp_y++;
             break;
+        case 70:
+            toggleItem();
+            break;
     }
 
     if(
@@ -187,6 +190,28 @@ function keyPush(evt){
     view_offset_y = Math.min(Math.max(0, player_y - 9), level.length - 19);
     
 }
+
+function toggleItem() {
+    equiped_item = (equiped_item + 1) % inventory.length;
+    var env_item_html;
+    switch(inventory[equiped_item]) {
+        case "fire":
+            inv_item_html = color_text("火", "red");
+            break;
+        case "ice":
+            inv_item_html = color_text("冰", "blue");
+            break;
+        case "earth":
+            inv_item_html = color_text("土", "green");
+            break;
+        case "air":
+            inv_item_html = color_text("气", "lightblue");
+            break;        
+    }
+    document.getElementsByClassName("inventory")[0].innerHTML = inv_item_html;
+
+}
+
 function game_loop(){
     current_time = new Date();
     for(var i = 0; i < level.length; i++){
@@ -218,7 +243,8 @@ function game_loop(){
         }
     }
 }
-
+var equiped_item = 0;
+var inventory = ["fire", "ice", "earth", "air"];
 var level;
 var view_offset_x = 0;
 var view_offset_y = 0;
