@@ -7,6 +7,13 @@ body{
     width: 60vw;
 
 }
+.translation-box {
+    width: 50vw;
+    height: 5vw;
+    padding: 1vw;
+    padding-left: 12px;
+    border:solid 3px red;
+}
 .map {
     width: 50vw;
     border:solid 3px red;
@@ -28,21 +35,25 @@ body{
     display: flex;
     flex-direction: row;
 }
-.inventory {
-    border:solid 3px yellow;
+.metabox {
+    border:solid 3px black;
     background-color: white;
     width: 10vw;
     height: 10vw;
     text-align: center;
     font-size: 6vw;
-    color: red;
+}
+
+.map-vertical {
+    display:table;
 }
 
 </style>
 <body>
     <div class="center">
         <div class="game-wrapper">
-            <div class="map">
+            <div class="map-vertical">
+                <div class="map">
                     <div class="view" id="r0">。。。。。。。。。。</div>
                     <div class="view" id="r1">。。。。。。请。。。</div>
                     <div class="view" id="r2">。。。。。。您。。。</div>
@@ -62,9 +73,16 @@ body{
                     <div class="view" id="r16">。。。。。。。。。。</div>
                     <div class="view" id="r17">。。。。。。。。。。</div>
                     <div class="view" id="r18">。。。。。。。。。。</div>
+                </div>
+                <div class="translation-box">translation goes here</div>
             </div>
-            <div class="inventory">火</div>
+            <div class="sidebar-wrapper">
+                <div class="metabox" id="inventory"></div>
+                <div class="metabox"></div>
+            </div>
+            
         </div>
+        
         
     </div>
 </body>

@@ -4,6 +4,7 @@ class tree {
         this.state = state;
         this.burn_start = undefined;
         this.spreads_fire = false;
+        this.translation = "tree";
     }
     getDisplay(){
         switch(this.state){
@@ -40,13 +41,14 @@ class tree {
         this.ignite();
     }
     player_can_traverse(){
-        return true;
+        return this.state === "burnt";
     }
 }
 class water {
     constructor(state){
         this.ripple_iterator = 0;
         this.color = undefined
+        this.translation = "water";
     }
     getDisplay(){ 
         var modifier = Math.floor(Math.random()*10000) % 8;
@@ -59,7 +61,7 @@ class water {
                 (Math.floor(Math.random()*10000) % 8).toString(16) +
                 (Math.floor(Math.random()*10000) % 8).toString(16) +
                 (Math.floor(Math.random()*10000) % 2).toString(16) +
-                "FF"
+                "FF";
         }
         this.ripple_iterator += 1;
     }
@@ -67,9 +69,10 @@ class water {
     player_can_traverse(){return false;}
 }
 class prop {
-    constructor(icon, color){
+    constructor(icon, color, translation){
         this.icon = icon;
         this.color = color;
+        this.translation = translation;
     }
     getDisplay(){
         return color_text(this.icon, this.color);
@@ -81,9 +84,10 @@ class prop {
 }
 
 class ground {
-    constructor(icon, color){
+    constructor(icon, color, translation){
         this.icon = icon;
         this.color = color;
+        this.translation = translation;
     }
     getDisplay(){
         return color_text(this.icon, this.color);
@@ -114,6 +118,7 @@ class forest {
         this.state = state;
         this.burn_start = undefined;
         this.spreads_fire = false;
+        this.translation = "forest";
     }
     getDisplay() {
         switch(this.state){
@@ -128,7 +133,7 @@ class forest {
     ignite(){
         if(this.state === "normal"){
             this.state = "burning";
-            this.burn_start = new Date()
+            this.burn_start = new Date();
         }
     }
     system(){
@@ -149,6 +154,33 @@ class forest {
     player_can_traverse(){
         return this.state === "burnt"
     }
+}
+
+class money {
+    constructor(money_amount){
+        this.money_amount = money_amount;
+    }
+    getDisplay(){
+        var char;
+        switch (this.money_amount) {
+            case 0:
+                return color_text("。", "white");
+            default:
+                return color_text("金", "gold");
+        }
+    }
+    ignite(){}
+    system(){}
+    player_interact(){
+        player_money += this.money_amount;
+        this.money_amount = 0;
+        console.log(player_money);
+    }
+    player_can_traverse(){
+        return true;
+    }
+
+
 }
 
 function color_text(text, color){
@@ -208,7 +240,7 @@ function toggleItem() {
             inv_item_html = color_text("气", "lightblue");
             break;        
     }
-    document.getElementsByClassName("inventory")[0].innerHTML = inv_item_html;
+    document.getElementById("inventory").innerHTML = inv_item_html;
 
 }
 
@@ -218,10 +250,10 @@ function game_loop(){
         for(var j = 0; j < level[0].length; j++) {
             level[i][j].system();
             if(level[i][j].spreads_fire){
-                if(i-1 >= 0){ level[i-1][j].ignite() }
-                if(i+1 < level.length){ level[i+1][j].ignite() }
-                if(j+1 < level[0].length){ level[i][j+1].ignite() }
-                if(j-1 >= 0){ level[i][j-1].ignite() }
+                if(i-1 >= 0){ level[i-1][j].ignite(); }
+                if(i+1 < level.length){ level[i+1][j].ignite(); }
+                if(j+1 < level[0].length){ level[i][j+1].ignite(); }
+                if(j-1 >= 0){ level[i][j-1].ignite(); }
                 
             }
         }
@@ -243,8 +275,9 @@ function game_loop(){
         }
     }
 }
-var equiped_item = 0;
+var equiped_item = -1;
 var inventory = ["fire", "ice", "earth", "air"];
+var player_money = 0;
 var level;
 var view_offset_x = 0;
 var view_offset_y = 0;
@@ -256,7 +289,7 @@ window.onload=function(){
     level_str = [
         "gggggggggggggggggggggggggggggwwwwgggggmmmmmmmmmmmmmmmmmmgmmm",
         "gggggtgggggggggggggggggggggggwwwwggggggmmmmmmmmgmmmmmmmmmmmm",
-        "ggggggggggggggggggggggggggggggwwwwggggggmmmmgmmmmmmtgggmmmmm",
+        "ggggggggggggggggggggggggggggggwwwwggggggmmmmgmmmmmmtgg8mmmmm",
         "ggggggggggggggggggggggggggggggwwwwgggggggmmmmmmmmgggmmmmmmmg",
         "ggggggggggggggtggggggggggggggggwwwwgggggmmmmmmmgggmmmmmmmmmg",
         "ggggggggggggggggggggggggggggggggwwwwgggmmmmmmmggmmmmmmmmmmgg",
@@ -285,7 +318,7 @@ window.onload=function(){
         "gggggggggggggggggggggggggggggggggggggggggggwq              q",
         "gggggggggggggggggggggggggggggggggggggggggggwq              q",
         "gggggggggggtggggggggggggggggtggggggggggggggwq              q",
-        "gggggggggggggggggggggggggggggggggggggggggggb               q",
+        "gggggggggggggggggggggggggggggggggggggggggggb       8       q",
         "gggggggggggggggggggggggggggggggggggggggggggwq              q",
         "gggggggggggggggggggggggggggggggggggggggggggwq              q",
         "gggggggggggggggggggggggggggggggggggggggggggwq              q",
@@ -297,6 +330,7 @@ window.onload=function(){
     init_level(level_str);
     document.addEventListener("keydown", keyPush);
     setInterval(game_loop, 1000/30)
+    toggleItem();
 }
 function init_level(level_str){
     level = new Array(level_str.length);
@@ -304,7 +338,8 @@ function init_level(level_str){
         level_embedded = new Array(level_str[i].length)
         level[i] = level_embedded;
         for(var j = 0; j < level[i].length; j++){
-            switch(level_str[i][j]){
+            const tile_val = level_str[i][j]
+            switch(tile_val){
                 case "t":
                     level[i][j] = new tree("normal")
                     break;
@@ -331,6 +366,17 @@ function init_level(level_str){
                     break;
                 case "b":
                     level[i][j] = new ground("桥", "brown");
+                    break;
+                case "1":
+                case "2":
+                case "3":
+                case "4":
+                case "5":
+                case "6":
+                case "7":
+                case "8":
+                case "9":
+                    level[i][j] = new money(parseInt(tile_val));
                     break;
             }
         }
