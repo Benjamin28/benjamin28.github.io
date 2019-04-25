@@ -381,7 +381,8 @@ const char_translations = new Map([
     ["英", "Hero"],
     ["森", "Forest"],
     ["焱", "Great Fire"],
-    ["土", "Earth"]]
+    ["土", "Earth"],
+    ["冰", "Ice"]]
 );
 
 window.onload=function(){
