@@ -22,6 +22,7 @@ class tree {
             this.burn_start = new Date()
         }
     }
+    freeze(){}
     system(){
         switch(this.state){
             case "normal":
@@ -49,24 +50,41 @@ class water {
         this.ripple_iterator = 0;
         this.color = undefined
         this.translation = "water";
+        this.state = state;
     }
-    getDisplay(){ 
-        var modifier = Math.floor(Math.random()*10000) % 8;
-        return color_text("水", this.color); 
+    getDisplay(){
+        switch(this.state){
+            case "liquid":
+                if(this.ripple_iterator % 10 === 0){
+                    this.color = "#" + 
+                        (Math.floor(Math.random()*10000) % 2).toString(16) +
+                        (Math.floor(Math.random()*10000) % 8).toString(16) +
+                        (Math.floor(Math.random()*10000) % 8).toString(16) +
+                        (Math.floor(Math.random()*10000) % 2).toString(16) +
+                        "FF";
+                }
+                this.ripple_iterator += 1;
+                return color_text("水", this.color); 
+            case "solid":
+                return color_text("冰", "silver");
+        }
+        
     }
     system(){
-        if(this.ripple_iterator % 10 === 0){
-            this.color = "#" + 
-                (Math.floor(Math.random()*10000) % 2).toString(16) +
-                (Math.floor(Math.random()*10000) % 8).toString(16) +
-                (Math.floor(Math.random()*10000) % 8).toString(16) +
-                (Math.floor(Math.random()*10000) % 2).toString(16) +
-                "FF";
+        if(this.state == "solid" 
+        && current_time - this.freeze_time > 2000){
+            this.state = "liquid"
         }
-        this.ripple_iterator += 1;
     }
+    player_interact(){}
     ignite(){}
-    player_can_traverse(){return false;}
+    freeze(){
+        if(this.state == "liquid"){
+            this.state = "solid";
+            this.freeze_time = current_time
+        }
+    }
+    player_can_traverse(){return this.state == "solid";}
 }
 class prop {
     constructor(icon, color, translation){
@@ -78,6 +96,7 @@ class prop {
         return color_text(this.icon, this.color);
     }
     ignite(){}
+    freeze(){}
     system(){}
     player_interact(){}
     player_can_traverse(){ return false; }
@@ -93,6 +112,7 @@ class ground {
         return color_text(this.icon, this.color);
     }
     ignite(){}
+    freeze(){}
     system(){}
     player_interact(){}
     player_can_traverse(){ return true; }
@@ -106,6 +126,7 @@ class empty {
         return color_text("。", "white");
     }
     ignite(){}
+    freeze(){}
     system(){}
     player_interact(){}
     player_can_traverse(){
@@ -136,6 +157,7 @@ class forest {
             this.burn_start = new Date();
         }
     }
+    freeze(){}
     system(){
         switch(this.state){
             case "normal":
@@ -169,7 +191,10 @@ class money {
                 return color_text("金", "gold");
         }
     }
-    ignite(){}
+    ignite(){
+        this.money_amount = 0
+    }
+    freeze(){}
     system(){}
     player_interact(){
         change_player_money(player_money + this.money_amount);
@@ -178,8 +203,6 @@ class money {
     player_can_traverse(){
         return true;
     }
-
-
 }
 
 function change_player_money(new_amount){
@@ -245,7 +268,15 @@ function keyPush(evt){
 
 function cast_spell(y, x) {
     if (x >= 0 && x < level[0].length && y >= 0 && y < level[0].length){
-        level[y][x].ignite();
+        switch (inventory[equiped_item]) {
+            case "fire":
+                level[y][x].ignite();
+                break;
+            case "ice":
+                level[y][x].freeze();
+                break;
+        }
+        
     }
 }
 
@@ -389,11 +420,11 @@ window.onload=function(){
         "gggggggggggggggggggggggggggggggggggggggggggbddddddd8dddddddq",
         "gggggggggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
         "gggggggggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
-        "gggggggggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
-        "gggggggggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
-        "ggggggggggggggggggggtggggggggggggggggggggggwqddddddddddddddq",
-        "gggggtgggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
-        "gggggggggggggggggggggggggggggggggggggggggggwqqqqqqqqqqqqqqqq",
+        "wwwwwwwggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
+        "wwwwwwwggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
+        "ww9wwwwgggggggggggggtggggggggggggggggggggggwqddddddddddddddq",
+        "wwwwwwwggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
+        "wwwwwwwggggggggggggggggggggggggggggggggggggwqqqqqqqqqqqqqqqq",
     ]
     init_level(level_str);
     document.addEventListener("keydown", keyPush);
@@ -419,7 +450,7 @@ function init_level(level_str){
                     level[i][j] = new forest("normal")
                     break;
                 case "w":
-                    level[i][j] = new water("normal")
+                    level[i][j] = new water("liquid")
                     break;
                 case "m":
                     level[i][j] = new prop("山", "sienna")
