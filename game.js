@@ -172,8 +172,6 @@ class money {
     ignite(){}
     system(){}
     player_interact(){
-        
-        console.log(player_money + this.money_amount);
         change_player_money(player_money + this.money_amount);
         this.money_amount = 0;
     }
