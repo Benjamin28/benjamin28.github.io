@@ -1,22 +1,23 @@
 <style>
 body{
-    background-color: bisque;
+    background-color: black;
 }
 .center{
     margin: auto;
-    width: 60vw;
+    width: 75vw;
 
 }
 .translation-box {
-    width: 50vw;
-    height: 5vw;
+    font-size: 1.5vw;
+    background: white;
+    width: 10vw;
     padding: 1vw;
     padding-left: 12px;
-    border:solid 3px red;
+    border:solid 3px black;
 }
 .map {
     width: 50vw;
-    border:solid 3px red;
+    border:solid 3px black;
     background-color: white;
     padding: 1vw;
     padding-left: 12px;
@@ -47,11 +48,26 @@ body{
 .map-vertical {
     display:table;
 }
+#coinpurse {
+    display: flex;
+    flex-wrap:wrap;
+}
+.coin {
+    display:inline-block;
+    height: 0.5vw;
+    width: 0.5vw;
+    background:gold;
+    margin:0.1vw;
+    border-radius: 0.25vw
+}
 
 </style>
 <body>
     <div class="center">
         <div class="game-wrapper">
+            <div class="sidebar-wrapper">
+                <div class="translation-box" id="translation-box"></div>
+            </div>
             <div class="map-vertical">
                 <div class="map">
                     <div class="view" id="r0">。。。。。。。。。。</div>
@@ -74,16 +90,13 @@ body{
                     <div class="view" id="r17">。。。。。。。。。。</div>
                     <div class="view" id="r18">。。。。。。。。。。</div>
                 </div>
-                <div class="translation-box">translation goes here</div>
             </div>
             <div class="sidebar-wrapper">
                 <div class="metabox" id="inventory"></div>
-                <div class="metabox"></div>
+                <div class="metabox" id="coinpurse"></div>
+                </div>
             </div>
-            
-        </div>
-        
-        
+        </div>  
     </div>
 </body>
 

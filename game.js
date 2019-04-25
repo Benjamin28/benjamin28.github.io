@@ -172,15 +172,22 @@ class money {
     ignite(){}
     system(){}
     player_interact(){
-        player_money += this.money_amount;
+        
+        console.log(player_money + this.money_amount);
+        change_player_money(player_money + this.money_amount);
         this.money_amount = 0;
-        console.log(player_money);
     }
     player_can_traverse(){
         return true;
     }
 
 
+}
+
+function change_player_money(new_amount){
+    player_money = new_amount;
+    const coin_str = "<div class=\"coin\"></div>";
+    document.getElementById("coinpurse").innerHTML = coin_str.repeat(player_money)
 }
 
 function color_text(text, color){
@@ -207,6 +214,21 @@ function keyPush(evt){
         case 70:
             toggleItem();
             break;
+        case 87:
+            cast_spell(player_y-1, player_x);
+            break;
+        case 65:
+            cast_spell(player_y, player_x-1);
+            break;
+        case 83:
+            cast_spell(player_y+1, player_x);
+            break;
+        case 68:
+            cast_spell(player_y, player_x+1);
+            break;
+        default:
+            console.log(evt.keyCode);
+            break;
     }
 
     if(
@@ -221,6 +243,12 @@ function keyPush(evt){
     view_offset_x = Math.min(Math.max(0, player_x - 9), level[0].length - 19);
     view_offset_y = Math.min(Math.max(0, player_y - 9), level.length - 19);
     
+}
+
+function cast_spell(y, x) {
+    if (x >= 0 && x < level[0].length && y >= 0 && y < level[0].length){
+        level[y][x].ignite();
+    }
 }
 
 function toggleItem() {
@@ -242,6 +270,19 @@ function toggleItem() {
     }
     document.getElementById("inventory").innerHTML = inv_item_html;
 
+}
+
+function generate_subtitles(char_to_colored_text) { 
+    var subtitle_divs = new Array();
+    plain_chars = Array.from(char_to_colored_text.keys()).sort();
+    plain_chars.forEach(function(element) {
+        if(element != "。"){
+            subtitle_divs.push(
+                "<div>" + char_to_colored_text.get(element) + ": " + char_translations.get(element) + "</div>");
+    
+        }
+    });
+    return subtitle_divs.join("");
 }
 
 function game_loop(){
@@ -267,13 +308,25 @@ function game_loop(){
         }
     }
 
-    level_view[player_y][player_x] = "英";
+    level_view[player_y][player_x] = color_text("英", "black");
     for(var i = 0; i < 19; i++){
         var toWrite = level_view[view_offset_y + i].join("");
         if (document.getElementById("r"+i).innerHTML != toWrite) {
             document.getElementById("r"+i).innerHTML = toWrite;
         }
     }
+    var char_to_html = new Map();
+
+    var level_chars = level_view.flat();
+    for (var i = 0; i < level_chars.length; i++){
+        const tile_char = level_chars[i].match(">(.)<")[1];
+        if(!char_to_html.has(tile_char)){
+            char_to_html.set(tile_char, level_chars[i]);
+        }
+    }
+    visible_chars_map = char_to_html;
+    const subtitles = generate_subtitles(char_to_html);
+    document.getElementById("translation-box").innerHTML = subtitles;
 }
 var equiped_item = -1;
 var inventory = ["fire", "ice", "earth", "air"];
@@ -284,6 +337,23 @@ var view_offset_y = 0;
 var player_y = 4;
 var player_x = 0;
 var current_time;
+var visible_chars_map;
+const char_translations = new Map([
+    ["山", "Mountain"],
+    ["墙", "Wall"],
+    ["路", "Road"],
+    ["草", "Grass"],
+    ["桥", "Bridge"],
+    ["木", "Tree"],
+    ["火", "Fire"],
+    ["灰", "Ash"],
+    ["水", "Water"],
+    ["金", "Gold"],
+    ["英", "Hero"],
+    ["森", "Forest"],
+    ["焱", "Great Fire"],
+    ["土", "Earth"]]
+);
 
 window.onload=function(){
     level_str = [
@@ -310,25 +380,26 @@ window.onload=function(){
         "ggggggggggggggggggggggggtttftgggggggggggwwgggggggggggggggggg",
         "gggggggggggggggggggggggggggtgggggggggggggwgggggggggggggggggg",
         "gggggggggggggggggggggggggggggggggggggggggwgggggggggggggggggg",
-        "gggggtggggggggggtgggggggggggggggggggggggggwgqqqqqqq qqqqqqqq",
-        "ggggggggggggggggggggggggggggggggggggggggggwgq              q",
-        "gggggggggggggggggggggggggggtggggggggggggggwgq              q",
-        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
-        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
-        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
-        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
-        "gggggggggggtggggggggggggggggtggggggggggggggwq              q",
-        "gggggggggggggggggggggggggggggggggggggggggggb       8       q",
-        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
-        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
-        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
-        "gggggggggggggggggggggggggggggggggggggggggggwq              q",
-        "ggggggggggggggggggggtggggggggggggggggggggggwq              q",
-        "gggggtgggggggggggggggggggggggggggggggggggggwq              q",
+        "gggggtggggggggggtgggggggggggggggggggggggggwgqqqqqqqdqqqqqqqq",
+        "ggggggggggggggggggggggggggggggggggggggggggwgqddddddddddddddq",
+        "gggggggggggggggggggggggggggtggggggggggggggwgqddddddddddddddq",
+        "gggggggggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
+        "gggggggggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
+        "gggggggggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
+        "gggggggggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
+        "gggggggggggtggggggggggggggggtggggggggggggggwqddddddddddddddq",
+        "gggggggggggggggggggggggggggggggggggggggggggbddddddd8dddddddq",
+        "gggggggggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
+        "gggggggggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
+        "gggggggggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
+        "gggggggggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
+        "ggggggggggggggggggggtggggggggggggggggggggggwqddddddddddddddq",
+        "gggggtgggggggggggggggggggggggggggggggggggggwqddddddddddddddq",
         "gggggggggggggggggggggggggggggggggggggggggggwqqqqqqqqqqqqqqqq",
     ]
     init_level(level_str);
     document.addEventListener("keydown", keyPush);
+
     setInterval(game_loop, 1000/30)
     toggleItem();
 }
@@ -367,6 +438,9 @@ function init_level(level_str){
                 case "b":
                     level[i][j] = new ground("桥", "brown");
                     break;
+                case "d":
+                    level[i][j] = new ground("土", "saddlebrown");
+                    break
                 case "1":
                 case "2":
                 case "3":
